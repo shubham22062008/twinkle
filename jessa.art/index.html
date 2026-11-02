@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="only light" />
+    <link rel="icon" type="image/svg+xml" href="image/favicon.svg?v=2" />
+    <link rel="icon" href="favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <script src="favfloat.js?v=2" defer></script>
+    <title>Jessa Wolfe · Pixel Pusher</title>
+    <meta name="description" content="Hi, I'm Jessa. I create delightful experiences, build and grow design teams, and chase problems worth solving." />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --ink: #494848;
+            --blush: #ffecec;
+            --pink: #ff9ec4;
+            --pink-deep: #f27aa8;
+            --spring: cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        iframe.site {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        /* music: a small blush pill bottom-right that opens the playlist; the player never reloads between pages */
+
+        .music {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 10;
+            font-family: "DM Sans", system-ui, sans-serif;
+        }
+
+        .music .btn {
+            appearance: none;
+            border: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 16px 10px 12px;
+            border-radius: 100px;
+            background: var(--blush);
+            color: var(--ink);
+            font: 700 13.5px/1 "DM Sans", system-ui, sans-serif;
+            position: relative;
+            isolation: isolate;
+            transition: transform .45s var(--spring);
+            filter: drop-shadow(0 10px 24px rgba(130, 95, 140, .16));
+        }
+
+        .music .btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            border-radius: inherit;
+            background: var(--blush);
+            filter: url(#wobs);
+        }
+
+        .music .btn:hover {
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        .music .btn .bars {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+        }
+
+        .music .btn .bars i {
+            width: 3px;
+            background: var(--pink-deep);
+            border-radius: 2px;
+            height: 40%;
+        }
+
+        .music.playing .btn .bars i {
+            animation: eq .9s ease-in-out infinite;
+        }
+
+        .music .btn .bars i:nth-child(2) {
+            animation-delay: -.3s;
+        }
+
+        .music .btn .bars i:nth-child(3) {
+            animation-delay: -.6s;
+        }
+
+        @keyframes eq {
+            0%,
+            100% {
+                height: 30%;
+            }
+            50% {
+                height: 100%;
+            }
+        }
+
+        /* the song that's actually playing, sliding along like a marquee when it's too long to fit */
+
+        .music .btn .lbl {
+            display: inline-block;
+            max-width: 168px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .music .btn .lbl.run {
+            width: 168px;
+            mask-image: linear-gradient(90deg, transparent, #000 8px, #000 calc(100% - 16px), transparent);
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 8px, #000 calc(100% - 16px), transparent);
+        }
+
+        .music .btn .lbl.run .mq {
+            display: inline-block;
+            animation: mq var(--dur, 12s) linear infinite;
+        }
+
+        .music:not(.playing) .btn .lbl.run .mq {
+            animation-play-state: paused;
+        }
+
+        @keyframes mq {
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .music .panel {
+            position: absolute;
+            right: 0;
+            bottom: 52px;
+            width: 340px;
+            padding: 10px;
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 18px 40px rgba(130, 95, 140, .2);
+            transform-origin: bottom right;
+            transform: scale(.6) translateY(16px);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .5s var(--spring), opacity .2s;
+        }
+
+        .music.open .panel {
+            transform: none;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .music .panel iframe {
+            display: block;
+            width: 100%;
+            height: 152px;
+            border: 0;
+            border-radius: 14px;
+        }
+
+        .music .panel .cap {
+            font: 700 12px/1 "DM Sans", system-ui, sans-serif;
+            color: var(--ink);
+            padding: 10px 6px 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .music .panel .cap a {
+            color: var(--pink-deep);
+            text-decoration: none;
+        }
+
+        /* night mode (switched inside the site; the page tells us): the pill goes dark with a pink outline */
+
+        html.night,
+        html.night body {
+            background: #17141b;
+        }
+
+        html.night .music .btn {
+            background: transparent;
+            color: #ece6f0;
+        }
+
+        html.night .music .btn::before {
+            background: #201c25;
+            box-shadow: inset 0 0 0 2px #ff9ec4, 0 10px 24px rgba(0, 0, 0, .5);
+        }
+
+        html.night .music .btn .bars i {
+            background: #ff9ec4;
+        }
+
+        html.night .music .panel {
+            background: #201c25;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .55), inset 0 0 0 1.5px rgba(255, 255, 255, .12);
+        }
+
+        html.night .music .panel .cap {
+            color: #ece6f0;
+        }
+
+        html.night .music .panel .cap a {
+            color: #ff9ec4;
+        }
+
+        @media (max-width: 860px),
+        (hover: none),
+        (pointer: coarse) {
+            .music {
+                display: none;
+            }
+        }
+
+        /* "What is Jessa working on?": a little green pill bottom-left that opens the in-progress page */
+
+        .now {
+            position: fixed;
+            left: 22px;
+            bottom: 22px;
+            z-index: 10;
+            appearance: none;
+            border: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 17px 10px 13px;
+            border-radius: 100px;
+            background: transparent;
+            color: #234a36;
+            font: 700 14px/1 "DM Sans", system-ui, sans-serif;
+            isolation: isolate;
+            text-decoration: none;
+            transition: transform .35s var(--spring);
+        }
+
+        .now::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            border-radius: inherit;
+            background: #c9f0d8;
+            filter: url(#wobs);
+            box-shadow: 0 8px 20px rgba(60, 140, 95, .18);
+        }
+
+        .now:hover {
+            transform: translateY(-2px) scale(1.04) rotate(-1.5deg);
+        }
+
+        .now .st {
+            width: 15px;
+            height: 15px;
+            flex: none;
+            fill: #2fae6c;
+            transition: transform .45s var(--spring);
+        }
+
+        .now:hover .st {
+            transform: rotate(90deg) scale(1.2);
+        }
+
+        .now.here {
+            display: none;
+        }
+
+        html.night .now {
+            color: #c9f0d8;
+        }
+
+        html.night .now .st {
+            fill: #7ee0a8;
+        }
+
+        html.night .now::before {
+            background: #1c2a23;
+            box-shadow: inset 0 0 0 2px #3fbf7f, 0 10px 24px rgba(0, 0, 0, .5);
+        }
+
+        @media (max-width: 860px),
+        (orientation: portrait) and (max-width: 1100px),
+        (max-height: 500px) {
+            .now {
+                display: none;
+            }
+        }
+
+        /* phones and upright tablets: it lives in Say hi instead (here it would run into the toolbar) */
+    </style>
+</head>
+
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="wobs" x="-10%" y="-20%" width="120%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03 0.05" numOctaves="2" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+    <iframe class="site" id="site" title="Jessa Wolfe's studio" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    <a class="now" id="now" href="#now.html"><svg class="st" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C10.9 6.6 13.4 9.1 18.5 10 13.4 10.9 10.9 13.4 10 18.5 9.1 13.4 6.6 10.9 1.5 10 6.6 9.1 9.1 6.6 10 1.5Z"/></svg>What is Jessa working on?</a>
+    <div class="music" id="music">
+        <div class="panel" id="panel">
+            <div id="spot"></div>
+            <div class="cap"><span>what I’m listening to</span><a href="https://open.spotify.com/playlist/0WlrQzwx5cEkDV2QAPoD9h" target="_blank" rel="noopener">open in Spotify ↗</a></div>
+        </div>
+        <button class="btn" id="musicBtn" type="button" aria-expanded="false"><span class="bars"><i></i><i></i><i></i></span><span class="lbl"><span class="mq">Press play</span></span></button>
+    </div>
+    <script>
+        (() => {
+            // a refresh starts the show over: forget which pages were already seen (see 'jw-seen' in app.html / case.js)
+            if ((performance.getEntriesByType('navigation')[0] || {}).type === 'reload') {
+                try {
+                    sessionStorage.removeItem('jw-seen');
+                } catch (_) {}
+            }
+            // tidy the address: jessa.art/index.html#about -> jessa.art/#about
+            if (/\/index\.html$/.test(location.pathname)) history.replaceState(null, '', location.pathname.replace(/index\.html$/, '') + location.hash);
+            const site = document.getElementById('site'),
+                music = document.getElementById('music'),
+                btn = document.getElementById('musicBtn');
+            // which inner page to show: #harbor.html, #about, #harbor.html (hash kept as-is)
+            const want = location.hash.slice(1);
+            const bust = u => {
+                const [p, hash] = u.split('#');
+                return p + (p.includes('?') ? '&' : '?') + 'r=' + Date.now() + (hash ? '#' + hash : '');
+            };
+            site.src = bust(want.includes('.html') ? want : 'app.html' + (want ? '#' + want : ''));
+            // the green pill opens the in-progress page in the site, and steps aside while you're on it
+            const nowPill = document.getElementById('now');
+            nowPill.addEventListener('click', e => {
+                e.preventDefault();
+                site.src = bust('now.html');
+                history.replaceState(null, '', '#now.html');
+            });
+            site.addEventListener('load', () => {
+                let here = false;
+                try {
+                    here = /\/now\.html$/.test(site.contentWindow.location.pathname);
+                } catch (_) {}
+                nowPill.classList.toggle('here', here);
+            });
+            site.addEventListener('load', () => {
+                try {
+                    const w = site.contentWindow;
+                    w.addEventListener('hashchange', () => {
+                        const u = (w.location.pathname.split('/').pop() + w.location.hash).replace(/^app\.html/, '');
+                        history.replaceState(null, '', '#' + u.replace(/^#/, ''));
+                    });
+                } catch (e) {}
+            });
+            // mirror the inner page's address into ours so links stay shareable
+            // follow the site's night mode, and start in it if the visitor chose it last time
+            try {
+                if (localStorage.getItem('jw-night') === '1' || (!localStorage.getItem('jw-night') && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('night');
+            } catch (e) {}
+            addEventListener('message', e => {
+                if (e.data && e.data.type === 'jw-night') document.documentElement.classList.toggle('night', !!e.data.on);
+            });
+            addEventListener('message', e => {
+                if (e.data && e.data.type === 'host:nav') {
+                    const u = e.data.url.replace(/^app\.html/, '');
+                    history.replaceState(null, '', '#' + (u.startsWith('#') ? u.slice(1) : u));
+                }
+            });
+            addEventListener('hashchange', () => {
+                const h = location.hash.slice(1);
+                const cur = (site.contentWindow.location.pathname.split('/').pop() + site.contentWindow.location.hash).replace(/^app\.html/, '');
+                if (h !== cur.replace(/^#/, '')) site.src = bust(h.includes('.html') ? h : 'app.html' + (h ? '#' + h : ''));
+            });
+            // the tab title decodes a word out of pixel blocks (Pixel Pusher, then Dreamer, Creator, Tired, Builder), holds, glitches away, and the next one pixels in.
+            // The <title> in the markup stays plain text for search engines and bookmarks.
+            (() => {
+                if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                const BASE = 'Jessa Wolfe \u00b7 ',
+                    WORDS = ['Pixel Pusher', 'Dreamer', 'Creator', 'Tired', 'Builder'];
+                let wi = 0,
+                    WORD = WORDS[0];
+                const GLYPHS = '\u2591\u2592\u2593\u2588\u259a\u259e\u2599\u259f\u259b\u259c\u25a0\u25aa\u25c6\u2726';
+                const g = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+                const show = k => {
+                    document.title = BASE + [...WORD].map((c, i) => c === ' ' || i < k ? c : g()).join('');
+                };
+                let k = 0,
+                    phase = 'in',
+                    flick = 0,
+                    until = 0;
+                const tick = () => {
+                    if (phase === 'in') {
+                        show(k);
+                        if (++flick >= 2) {
+                            flick = 0;
+                            k++;
+                        }
+                        if (k > WORD.length) {
+                            phase = 'hold';
+                            until = Date.now() + 5000;
+                            document.title = BASE + WORD;
+                        }
+                    } else if (phase === 'hold') {
+                        if (Date.now() > until) {
+                            phase = 'out';
+                            k = WORD.length;
+                        }
+                    } else {
+                        show(k);
+                        k -= 2;
+                        if (k < 0) {
+                            phase = 'in';
+                            k = 0;
+                            wi = (wi + 1) % WORDS.length;
+                            WORD = WORDS[wi];
+                        }
+                    } // wiped away: the next word pixels in
+                    setTimeout(tick, phase === 'hold' ? 500 : 70); // background tabs get slowed to ~1 step a second by the browser; it just decodes slower
+                };
+                setTimeout(tick, 600);
+            })();
+            btn.addEventListener('click', () => {
+                const open = music.classList.toggle('open');
+                btn.setAttribute('aria-expanded', open);
+            });
+            // the playlist runs through Spotify's embed API, so the pill knows what's really playing (and when it's paused)
+            const SONGS = {
+                "0SeMmdPt7Ksu1fIAgnPIOG": ["Raconte-Moi Une Histoire · M83", 244093],
+                "5FhR3iMNhjkDDJYvS6e2wP": ["Osaka Loop Line · Discovery", 241733],
+                "4G21jWo0Cm6lOIUNnZ2mUI": ["Such Great Heights · The Postal Service", 266506],
+                "4LF1dMlOHe8VfmMut7YiIs": ["Transatlanticism · Death Cab for Cutie", 475093],
+                "2IvNxLl01CTAfCOA103Tgx": ["No One's Gonna Love You · Band of Horses", 217333],
+                "35KiiILklye1JRRctaLUb4": ["Holocene · Bon Iver", 336613],
+                "57zPzYQf43mAewduTJPJLp": ["Oceans Niagara · M83", 271656],
+                "0yQPpUq5BJyqah5m2Q5Stt": ["Hoppípolla · Sigur Rós", 268706],
+                "0rg69E3wqGu7cGZCIkHvdS": ["Man on Fire · Edward Sharpe & The Magnetic Zeros", 259079],
+                "2nzWQEjNlTsOkNfZ0n6gE4": ["58500 · Enfant Sauvage", 316400],
+                "7dwCUb3OXadzAMWj5tzqyP": ["So Here We Are · Bloc Party", 232400],
+                "1Tr7e3ieztG87RTG3vGLp7": ["Tiderays · Volcano Choir", 297306],
+                "1odU6ORtuHt4GqVYbtfzQN": ["So Insane · Discovery", 192533],
+                "3l14MJpQB4tFFgKLqUqtV3": ["The District Sleeps Alone Tonight · The Postal Service", 283746],
+                "4QDlcd4wAmmXXtKryfTxnO": ["Skeletons · Yeah Yeah Yeahs", 302160],
+                "766EIreId79ZFBkiDO1Ial": ["Our Swords · Band of Horses", 146306],
+                "7CIKMtUUz31yX6MNX2nGbB": ["Towers · Bon Iver", 188040],
+                "7mpUknu2kArAJe9GMTQscr": ["Ash/Black Veil · Apparat", 344320],
+                "68hYdj3GepWm2R202KhJT7": ["1901 · Phoenix", 193106],
+                "6ffHgE67bfcvaab8QUUcDI": ["All Wash Out · Edward Sharpe & The Magnetic Zeros", 280920],
+                "1dr1B13MHzq77BC5d4zko9": ["Water (feat. Rostam) · Ra Ra Riot, Rostam", 280333],
+                "2PAhcPwab2sJz340QHtunD": ["This Modern Love · Bloc Party", 265706],
+                "0UG45r1E8VGzjzbB5BjnTW": ["Island, IS · Volcano Choir", 248786],
+                "5qIOUorQ9AInP9UliORgCC": ["The Wall & I · Nation of Language", 304714],
+                "4gW0C3SyybbjP9cAKZVUBh": ["Brand New Colony · The Postal Service", 252653],
+                "38ez95PqIVX72XSvCiJRpp": ["The Great Estates · Freelance Whales", 241680],
+                "6iYZuHW7IAUTvUpvRTVQZA": ["The Great Salt Lake · Band of Horses", 285386],
+                "5Y8sPOwWupGEGM7ifBDR7F": ["Run Into Flowers · M83", 249426],
+                "6Aa3DfXWVWtgkJ3oLQtFmD": ["No Way · The Naked And Famous", 329800],
+                "2bD1AW4yqiCurGCva6r88a": ["You Are a Tourist · Death Cab for Cutie", 286653],
+                "6Hmj7SrLRbreLVfVS7mV1S": ["Wake Up · Arcade Fire", 335333],
+                "2ztxGTxHtQFZKlkb9wT5kr": ["I Could Go · Oberhofer", 267440],
+                "36TzOkh8wrsLiyK3EVWKbl": ["Ten Thousand Lines · Electric President", 335200],
+                "6ys7rEnUbRpHsgYVaLnBOu": ["Dancepack · Volcano Choir", 259079],
+                "6yhca6TNRzwG2zp6AuidaE": ["Can't Do Without You · Caribou", 236400],
+                "0xn9WsyWhNbfI82Ipnpwqa": ["We Will Become Silhouettes · The Postal Service", 300546],
+                "1OVypFlcraAhyvPqIMWDor": ["The Mother We Share · CHVRCHES", 191293],
+                "4uPR4wRw419VH5TasUr9Cg": ["Objects Of My Affection · Peter Bjorn and John", 275306],
+                "1tBZgW287YNKFDgAXTby65": ["The Greatest Light Is The Greatest Shade · The Joy Formidable", 320893],
+                "1F1oSc7mdgcqZGO1zSWtWc": ["Don't Save Us From The Flames · M83", 255866],
+                "6Z8I9zzJb5WCAJkz6qBo7k": ["Girlfriend · Phoenix", 204106],
+                "3Bz3lj6E9VFBk1Wj1hC8vw": ["Sleeping Lessons · The Shins", 237726],
+                "0epAG0WWRlDMsMFJiE5c6I": ["Sprawl II (Mountains Beyond Mountains) · Arcade Fire", 325706],
+                "1njWZTiH6k7WkReOx43ieW": ["Lazy Eye - Jason Bentley Remix · Silversun Pickups, Jason Bentley", 348240],
+                "3l0pdat6N0XcotNr2b7rNl": ["A Violent Sky · Apparat", 311186],
+                "7ERTEbKKmy86k7qPQktpex": ["Acetate · Volcano Choir", 294080],
+                "5TS9LZZ3nf3W0EPZKZiYFX": ["Nothing Better · The Postal Service", 226613],
+                "7kAzt3TcptRtX8vd5deWd9": ["40 Day Dream · Edward Sharpe & The Magnetic Zeros", 232690],
+                "0F2Y1p6N0afkLzpBJGkHtc": ["Clair De Lune · Flight Facilities, Christine Hoberg", 459840],
+                "77WtxmZK9ZITjETJsTww2V": ["Coloring the void · M83", 207493]
+            }; // id: [song · artist, length in ms]
+            const lbl = btn.querySelector('.lbl'),
+                mq = btn.querySelector('.mq'),
+                panel = document.getElementById('panel');
+            const say = t => {
+                if (mq.dataset.t === t) return;
+                mq.dataset.t = t;
+                lbl.classList.remove('run');
+                mq.textContent = t;
+                btn.title = t;
+                requestAnimationFrame(() => {
+                    if (lbl.scrollWidth > lbl.clientWidth + 2) {
+                        const sep = '\u2003\u2726\u2003';
+                        mq.textContent = t + sep + t + sep;
+                        mq.style.setProperty('--dur', Math.round(t.length * .3 + 3) + 's');
+                        lbl.classList.add('run');
+                    }
+                });
+            };
+            // a song added to the playlist later still gets its name, straight from Spotify
+            // signed in to Spotify, the player can report a regional copy of a song (a different id), so a song's length is the backup match
+            const byLength = ms => {
+                if (!(ms > 60000)) return '';
+                let best = '',
+                    bd = 2500;
+                for (const [n, d] of Object.values(SONGS)) {
+                    const x = Math.abs(d - ms);
+                    if (x < bd) {
+                        bd = x;
+                        best = n;
+                    }
+                }
+                return best;
+            };
+            const nameOf = async (uri, ms) => {
+                const [, type, id] = String(uri).split(':');
+                if (SONGS[id]) return SONGS[id][0];
+                const near = byLength(ms);
+                if (near) return near;
+                if (type !== 'track' && type !== 'episode') return '';
+                try {
+                    const r = await fetch(`https://open.spotify.com/oembed?url=https://open.spotify.com/${type}/${id}`);
+                    return (await r.json()).title || '';
+                } catch (_) {
+                    return '';
+                }
+            };
+            let nowUri = '';
+            window.onSpotifyIframeApiReady = API => API.createController(document.getElementById('spot'), {
+                uri: 'spotify:playlist:0WlrQzwx5cEkDV2QAPoD9h',
+                width: '100%',
+                height: 152
+            }, c => c.addListener('playback_update', async e => {
+                const d = (e && e.data) || {};
+                music.classList.toggle('playing', !d.isPaused);
+                const key = (d.playingURI || '') + '|' + Math.round((d.duration || 0) / 1000); // a new song shows up as a new id or a new length
+                if ((d.playingURI || d.duration) && key !== nowUri) {
+                    nowUri = key;
+                    const n = await nameOf(d.playingURI, d.duration);
+                    if (key === nowUri) say(n || 'Now playing');
+                }
+            }));
+            // keep the player's dark look (the API builds the iframe; add the theme before it loads)
+            new MutationObserver(rs => rs.forEach(r => r.addedNodes.forEach(n => {
+                if (n.tagName === 'IFRAME' && !/theme=0/.test(n.src)) {
+                    n.src += (n.src.includes('?') ? '&' : '?') + 'theme=0';
+                    n.title = "Jessa's playlist";
+                }
+            }))).observe(panel, {
+                childList: true,
+                subtree: true
+            });
+            // if a blocker stops Spotify's script, fall back to the plain player (no song name, but the music still works)
+            const plain = () => {
+                const el = document.getElementById('spot');
+                if (!el) return;
+                const f = document.createElement('iframe');
+                f.src = 'https://open.spotify.com/embed/playlist/0WlrQzwx5cEkDV2QAPoD9h?utm_source=generator&theme=0';
+                f.title = "Jessa's playlist";
+                f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+                el.replaceWith(f);
+            };
+            setTimeout(() => {
+                const sc = document.createElement('script');
+                sc.src = 'https://open.spotify.com/embed/iframe-api/v1';
+                sc.async = true;
+                sc.onerror = plain;
+                document.head.appendChild(sc);
+                setTimeout(() => {
+                    if (!panel.querySelector('iframe')) plain();
+                }, 6000);
+            }, 1500);
+            document.addEventListener('click', e => {
+                if (!music.contains(e.target)) music.classList.remove('open');
+            });
+        })();
+    </script>
+</body>
+<script>
+    'undefined' === typeof _trfq || (window._trfq = []);
+    'undefined' === typeof _trfd && (window._trfd = []), _trfd.push({
+        'tccl.baseHost': 'secureserver.net'
+    }, {
+        'ap': 'cpbh-mt'
+    }, {
+        'server': 'p3plmcpnl494782'
+    }, {
+        'dcenter': 'p3'
+    }, {
+        'cp_id': '7611390'
+    }, {
+        'cp_cl': '8'
+    }) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.
+</script>
+<script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script>
+
+</html>

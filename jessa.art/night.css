@@ -1,0 +1,1201 @@
+/* Night mode: "the lights are off". Everything is dark and easy to read. Nothing colorful is filled in:
+   the pastels become thin glowing outlines, like neon in a dark room. Text is soft white everywhere. */
+
+html.night {
+    color-scheme: dark;
+}
+
+html.night {
+    --ink: #ece6f0;
+    --ink-soft: #b2a8bc;
+    --ink-faint: #7b7186;
+    --paper: #17141b;
+    --dot: #2f2836;
+    --card: #201c25;
+    --line: rgba(255, 255, 255, .07);
+    /* the pastels, used only as outline colors */
+    --blush: #f4a9c6;
+    --blush-2: #f7bcd3;
+    --pink: #ff9ec4;
+    --pink-deep: #ff8fbd;
+    --peach: #f6b998;
+    --butter: #ecd57a;
+    --butter-deep: #f3d96a;
+    --mint: #8fd2ae;
+    --mint-deep: #7ad3a3;
+    --sky: #9cc4f2;
+    --sky-deep: #8cc1ff;
+    --lilac: #c0abf5;
+    --lilac-deep: #c2a9ff;
+    --coral: #ff9a7b;
+    --shadow: 0 14px 40px rgba(0, 0, 0, .5);
+}
+
+html.night body {
+    background-color: var(--paper);
+    color: var(--ink);
+}
+
+/* frames: a dark card. Colored frames (marked .tint by night.js) get an outline in their color */
+
+html.night .slot .box::before {
+    background: var(--card);
+    filter: url(#wob);
+    box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+html.night .slot.tint .box::before {
+    box-shadow: inset 0 0 0 2px var(--tc);
+}
+
+html.night .slot.grab .box::before,
+html.night .tile.landed:hover .box::before {
+    filter: url(#wob);
+}
+
+/* pills, chips and buttons drawn with the wobbly pill: outline only */
+
+html.night .wob::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .22);
+}
+
+html.night .wob.tint::before {
+    box-shadow: inset 0 0 0 2px var(--tc);
+}
+
+html.night .wob,
+html.night .wob * {
+    color: var(--ink);
+}
+
+html.night .wob svg {
+    stroke: var(--ink);
+}
+
+/* the floating nav and the toolbar: dark glass with a soft pink edge */
+
+html.night .pages::before,
+html.night .toolbar .blob {
+    background: #1f1a24;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 158, 196, .55);
+}
+
+html.night .pages,
+html.night .toolbar .blob {
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .5)) !important;
+}
+
+html.night .pages .chip {
+    color: var(--ink);
+}
+
+html.night .pages .chip:hover::before {
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .3);
+    background: rgba(255, 255, 255, .05);
+}
+
+html.night .pages .chip.active::before {
+    box-shadow: inset 0 0 0 2px var(--pink);
+    background: transparent;
+    filter: url(#wobs);
+}
+
+html.night .pages .crumb::before {
+    box-shadow: inset 0 0 0 2px var(--butter);
+}
+
+html.night .pages .file .logo {
+    content: url(image/logo-night.svg);
+}
+
+/* the logo in the same soft white as the words */
+
+html.night .tool svg {
+    stroke: var(--ink);
+}
+
+html.night .tool:hover {
+    background: rgba(255, 255, 255, .07);
+}
+
+html.night .tool.active {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--pink);
+}
+
+html.night .tbsep {
+    background: rgba(255, 255, 255, .12);
+}
+
+html.night .tip {
+    background: #ece6f0;
+    color: #17141b;
+}
+
+html.night .toolbar .cm-pill,
+html.night .toolbar .cm-pill * {
+    color: var(--ink);
+}
+
+html.night .toolbar .cm-pill::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--butter);
+}
+
+html.night .subfloat a.active::before {
+    box-shadow: inset 0 0 0 2px var(--pink);
+}
+
+/* people dots: dark circles ringed in their color */
+
+html.night .people .dot::before {
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--cs, var(--pink));
+}
+
+html.night .people .dot,
+html.night .people .dot span {
+    color: var(--ink);
+}
+
+html.night .people .dot .lbl {
+    background: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .15);
+}
+
+html.night .people .dot.more::before {
+    box-shadow: inset 0 0 0 2px var(--butter);
+}
+
+/* cursors: name tags become outlined too */
+
+html.night .cur .bub {
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--c, var(--pink)), 0 6px 16px rgba(0, 0, 0, .4);
+}
+
+html.night .cur .bub,
+html.night .cur .bub * {
+    color: var(--ink);
+}
+
+/* home page bits */
+
+html.night .menu a::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--bg);
+}
+
+html.night .social .so {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--sbg, var(--blush));
+    color: var(--ink);
+}
+
+html.night .social .so svg,
+html.night .social .so svg * {
+    stroke: var(--ink);
+}
+
+html.night .hlabel::before {
+    background: var(--card);
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .15);
+    filter: url(#wobs) drop-shadow(0 10px 24px rgba(0, 0, 0, .5));
+}
+
+html.night .hlabel,
+html.night .hlabel * {
+    color: var(--ink);
+}
+
+html.night .tile .tv::before {
+    background: rgba(23, 20, 27, .88);
+}
+
+html.night .tile .tv {
+    color: var(--ink);
+}
+
+html.night .tile .nw::before {
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--mint);
+}
+
+html.night .tile .hot::before {
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--butter);
+}
+
+html.night .tile .nw,
+html.night .tile .hot {
+    color: var(--ink);
+}
+
+html.night .tile .nw path {
+    stroke: var(--ink);
+}
+
+html.night .tile.landed .nw .s1,
+html.night .tile.landed .nw .s2 {
+    --ff: transparent;
+}
+
+html.night .tile .content {
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
+}
+
+html.night .lnum::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2.5px var(--sf);
+}
+
+html.night .lnum span {
+    color: var(--ink);
+}
+
+html.night .lhead .typing::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--peach);
+}
+
+html.night .larr::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--blush);
+}
+
+html.night .larr {
+    color: var(--ink);
+}
+
+html.night .smiley .box::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--mint);
+}
+
+html.night .smiley svg path {
+    stroke: var(--ink);
+}
+
+html.night .marquee-box .lead,
+html.night .dot .lbl,
+html.night .say,
+html.night .cur .held,
+html.night .gemos {
+    background: var(--card);
+    color: var(--ink);
+}
+
+html.night .slot .h {
+    background: var(--paper);
+}
+
+html.night .talk video,
+html.night .talk img {
+    background: var(--card);
+}
+
+html.night .scrap.polaroid .box::before {
+    background: #ece6f0;
+    box-shadow: none;
+}
+
+html.night .scrap.polaroid,
+html.night .scrap.polaroid * {
+    color: #2b2530;
+}
+
+html.night .cform .f .in::before {
+    background: #1b1720;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .15);
+}
+
+html.night .cform .f:focus-within .in::before {
+    box-shadow: inset 0 0 0 2px var(--pink);
+}
+
+html.night .cform input,
+html.night .cform textarea {
+    color: var(--ink);
+}
+
+html.night .cform input::placeholder,
+html.night .cform textarea::placeholder {
+    color: var(--ink-faint);
+}
+
+html.night .cform .send::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--mint);
+}
+
+html.night .cform .send {
+    color: var(--ink);
+}
+
+/* guestbook: notes are dark paper outlined in their color, tape stays bright */
+
+html.night .gnote:not(.gdoodle) {
+    background: var(--card) !important;
+    box-shadow: inset 0 0 0 2px var(--c, var(--butter)), 0 10px 24px rgba(0, 0, 0, .4);
+    color: var(--ink);
+}
+
+html.night .gnote:not(.gdoodle) * {
+    color: inherit;
+}
+
+html.night .gtape,
+html.night .gnote::before {
+    background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .28) 0 6px, transparent 6px 14px), linear-gradient(var(--tape, rgba(255, 158, 196, .6)), var(--tape, rgba(255, 158, 196, .6))), #f6f0f4;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .35);
+    opacity: .9;
+}
+
+html.night .scrap .pin {
+    background: linear-gradient(var(--tape, rgba(255, 158, 196, .6)), var(--tape, rgba(255, 158, 196, .6))), #f6f0f4;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .35);
+    opacity: .9;
+}
+
+/* comments: a dark panel with readable words */
+
+html.night .cpanel {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .55), inset 0 0 0 1.5px rgba(255, 255, 255, .12);
+}
+
+html.night .cpanel *,
+html.night .unote,
+html.night .unote * {
+    color: var(--ink);
+}
+
+html.night .cp-card,
+html.night .cp-box {
+    background: #2a2430;
+}
+
+html.night .cpanel input::placeholder,
+html.night .cpanel textarea::placeholder,
+html.night .unote textarea::placeholder {
+    color: var(--ink-faint);
+}
+
+html.night .cp-head .cp-n {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--butter);
+    color: var(--ink);
+}
+
+/* case-study buttons that were dark: an outlined pill now */
+
+html.night .cta {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--ink);
+    color: var(--ink);
+}
+
+html.night .cta svg {
+    stroke: var(--ink);
+}
+
+html.night .flow-head .subnav a.active {
+    color: var(--ink);
+}
+
+/* Mochiboard page */
+
+html.night body.mboard .mb-tool .why,
+html.night body.mboard .mb-dl .needs>div {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .12);
+    color: var(--ink-soft);
+}
+
+html.night body.mboard .mb-tool h4,
+html.night body.mboard .mb-tool .what,
+html.night body.mboard .mb-tool .why b,
+html.night body.mboard .mb-tool .why::before,
+html.night body.mboard .mb-vid h4,
+html.night body.mboard .mb-dl h2,
+html.night body.mboard .mb-dl .needs b,
+html.night body.mboard .mb-dl .steps b,
+html.night body.mboard .mb-dl .howto-t,
+html.night body.mboard .mb-cta h3 {
+    color: var(--ink);
+}
+
+html.night body.mboard .mb-vid p,
+html.night body.mboard .mb-dl p,
+html.night body.mboard .mb-dl .steps,
+html.night body.mboard .mb-dl small,
+html.night body.mboard .mb-cta p,
+html.night body.mboard .note {
+    color: var(--ink-soft);
+}
+
+html.night body.mboard .mb-dl .howto {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .12);
+}
+
+html.night body.mboard .mb-tool .ic {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .25);
+}
+
+html.night body.mboard .mb-tool .ic svg,
+html.night body.mboard .mb-tool .ic svg * {
+    stroke: var(--ink) !important;
+}
+
+html.night body.mboard .mb-vid .win,
+html.night body.mboard .mb-vid .win i.bar {
+    background: #1f1a24;
+    border-color: rgba(255, 255, 255, .08);
+}
+
+html.night body.mboard .mb-dl .get::before,
+html.night body.mboard .mb-cta a.ink::before {
+    background: #ece6f0;
+    box-shadow: none;
+}
+
+html.night body.mboard .mb-dl .get,
+html.night body.mboard .mb-dl .get *,
+html.night body.mboard .mb-cta a.ink,
+html.night body.mboard .mb-cta a.ink * {
+    color: #17141b !important;
+}
+
+html.night body.mboard .mb-dl .get svg {
+    stroke: #17141b;
+}
+
+html.night body.mboard .mb-tools-nav button {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .25);
+}
+
+html.night body.mboard .mb-tools-nav svg {
+    stroke: var(--ink);
+}
+
+/* pictures keep their own light, a touch dimmer so white screenshots don't glare */
+
+html.night .slot img:not([src$=".svg"]):not(.mo-px),
+html.night .slot video {
+    filter: brightness(.92);
+}
+
+html.night body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(900px 600px at 18% 6%, rgba(255, 158, 196, .05), transparent 70%), radial-gradient(900px 700px at 90% 100%, rgba(140, 193, 255, .045), transparent 70%);
+}
+
+/* the night switch */
+
+.night-toggle {
+    position: fixed;
+    z-index: 60;
+    top: 18px;
+    right: 470px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 0;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(130, 95, 140, .16);
+    transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.night-toggle:hover {
+    transform: rotate(-12deg) scale(1.08);
+}
+
+.night-toggle svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: #494848;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+html.night .night-toggle {
+    background: #1f1a24;
+    box-shadow: inset 0 0 0 1.5px rgba(243, 217, 106, .6), 0 6px 16px rgba(0, 0, 0, .5);
+}
+
+html.night .night-toggle svg {
+    stroke: #f3d96a;
+    fill: #f3d96a;
+}
+
+.night-star {
+    position: fixed;
+    z-index: 1;
+    pointer-events: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff6c8;
+    box-shadow: 0 0 10px 2px rgba(255, 240, 180, .6);
+    animation: nightTwinkle 1.6s ease-out forwards;
+}
+
+@keyframes nightTwinkle {
+    0% {
+        opacity: 0;
+        transform: scale(.2);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(.6) translateY(-14px);
+    }
+}
+
+@media (max-width: 860px) {
+    .night-toggle {
+        top: auto;
+        bottom: 96px;
+        right: 16px;
+    }
+}
+
+/* tweaks after the first look at the outline style */
+
+/* top nav: no outline on each item unless it's the page you're on */
+
+html.night .pages .chip:not(.active):not(.crumb)::before,
+html.night .subfloat a:not(.active)::before {
+    box-shadow: none;
+    background: transparent;
+}
+
+html.night .pages .chip:not(.active):not(.crumb):hover::before,
+html.night .subfloat a:not(.active):hover::before {
+    background: rgba(255, 255, 255, .07);
+}
+
+/* the smiley: a dark circle with a green face */
+
+html.night .smiley .box::before {
+    background: #0f0d12;
+    box-shadow: inset 0 0 0 1.5px rgba(143, 210, 174, .35);
+}
+
+html.night .smiley svg path {
+    stroke: var(--mint);
+}
+
+/* no washi tape at night */
+
+html.night .gtape,
+html.night .gnote::before,
+html.night .scrap .pin {
+    display: none;
+}
+
+/* the second button in the download box keeps light words */
+
+html.night body.mboard .mb-dl .try,
+html.night body.mboard .mb-cta a.soft {
+    color: var(--ink);
+}
+
+/* guestbook: no solid color blocks */
+
+html.night .ghl::before {
+    background: transparent;
+    box-shadow: inset 0 0 0 2.5px var(--pink);
+}
+
+html.night .gpad {
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--pink), 0 14px 30px rgba(0, 0, 0, .45);
+}
+
+html.night .gpad textarea {
+    color: var(--ink);
+}
+
+html.night .gpad textarea::placeholder {
+    color: var(--ink-soft);
+    opacity: .7;
+}
+
+html.night .gform .send::before {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 2px var(--pink);
+}
+
+html.night .gform .send,
+html.night .gform .send * {
+    color: var(--ink);
+}
+
+html.night .gcount {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--butter);
+    color: var(--ink);
+}
+
+html.night .gnote.gdoodle {
+    background: var(--card) !important;
+    box-shadow: inset 0 0 0 2px var(--pink-deep), 0 10px 24px rgba(0, 0, 0, .4);
+}
+
+/* the smiley: a crisp white face on its dark circle */
+
+html.night .smiley svg *,
+html.night .smiley svg path {
+    stroke: #fff !important;
+}
+
+/* About photos: dark frames instead of white polaroid borders */
+
+html.night .scrap.polaroid .box::before {
+    background: var(--card);
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .14);
+}
+
+html.night .scrap.polaroid,
+html.night .scrap.polaroid * {
+    color: var(--ink);
+}
+
+/* cursors, the waving hand and the grab hand: dark inside, colored outline (they read as blobs when both were bright) */
+
+html.night .cur .tipv path {
+    fill: var(--card);
+    stroke-width: 1.6;
+}
+
+html.night .cur .hand .f,
+html.night .cur .grabhand .f>* {
+    fill: var(--card);
+}
+
+/* the night switch lives in the toolbar now, as one of the tools */
+
+html.night .night-tool svg {
+    stroke: #fff;
+    fill: none;
+}
+
+/* Work tiles: the picture is the card, so no frame peeking out behind it */
+
+html.night .tile .box::before,
+html.night .tile.tint .box::before {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* every frame gets a colored outline: plain ones borrow a pastel in turn (set by night.js as --tc) */
+
+html.night .slot.tint-auto .box::before {
+    box-shadow: inset 0 0 0 2px var(--tc);
+}
+
+html.night .tile .box::before {
+    box-shadow: none !important;
+}
+
+/* black logos in "What I built it with" turn white */
+
+html.night .tools .tlc img[src*="claude.svg"],
+html.night .tools .tlc img[src*="mobbin.png"],
+html.night .tools .tlc img[src*="threedotjs"],
+html.night .tools .tlc img[src*="elevenlabs"] {
+    filter: invert(1) brightness(1.1);
+}
+
+/* the smiley: green like its ring */
+
+html.night .smiley svg *,
+html.night .smiley svg path {
+    stroke: var(--mint) !important;
+}
+
+html.night .smiley .box::before {
+    box-shadow: inset 0 0 0 2px var(--mint);
+}
+
+html.night .scrap.polaroid.tint-auto .box::before {
+    box-shadow: inset 0 0 0 2px var(--tc);
+}
+
+/* "most viewed" fire: just a light outline at night, no orange fill */
+
+html.night .tile .hot .f1,
+html.night .tile .hot .f2 {
+    --ff: transparent;
+    stroke: var(--ink);
+}
+
+html.night .tile .hot path {
+    stroke: var(--ink);
+}
+
+html.night .tile .hot svg path,
+html.night .tile .hot svg * {
+    fill: transparent !important;
+    stroke: var(--ink) !important;
+}
+
+/* Luminance "why" tags (For me / for the game / for the players): outlined, words in their color */
+
+/* Mochi page download button: a light pill with dark words */
+
+html.night body.mochi .mo-dl .get::before {
+    background: #ece6f0;
+    box-shadow: none;
+}
+
+html.night body.mochi .mo-dl .get,
+html.night body.mochi .mo-dl .get * {
+    color: #17141b !important;
+}
+
+html.night body.mochi .mo-dl .get svg {
+    stroke: #17141b !important;
+}
+
+/* case study cover banners: a full pink outline so they stand out on the dark (no frame peeking out behind) */
+
+html.night .cs-cover .box::before {
+    inset: -11px;
+    background: transparent !important;
+    box-shadow: inset 0 0 0 2.5px var(--pink) !important;
+    filter: url(#wob);
+}
+
+/* the hand-drawn frame floats just outside the picture */
+
+html.night .cs-cover .content {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+}
+
+/* numbered circles (small rules, choices): outlined, numbers in their color */
+
+html.night .choices.zig .choice .n,
+html.night body.harbor .choice .n {
+    background: transparent !important;
+    color: var(--nc, var(--pink)) !important;
+    box-shadow: inset 0 0 0 2px var(--nc, var(--pink)) !important;
+}
+
+html.night .choices.zig .choice:nth-child(6n+2) .n,
+html.night body.harbor .choice:nth-child(3n+2) .n {
+    --nc: var(--mint);
+}
+
+html.night .choices.zig .choice:nth-child(6n+3) .n,
+html.night body.harbor .choice:nth-child(3n) .n {
+    --nc: var(--sky);
+}
+
+html.night .choices.zig .choice:nth-child(6n+4) .n {
+    --nc: var(--butter);
+}
+
+html.night .choices.zig .choice:nth-child(6n+5) .n {
+    --nc: var(--lilac);
+}
+
+html.night .choices.zig .choice:nth-child(6n) .n {
+    --nc: var(--peach);
+}
+
+html.night .rulecard .rn {
+    background: transparent !important;
+    color: var(--nc, var(--pink)) !important;
+    box-shadow: inset 0 0 0 2px var(--nc, var(--pink)) !important;
+}
+
+html.night .rulecard:nth-child(2) .rn {
+    --nc: var(--mint);
+}
+
+html.night .rulecard:nth-child(3) .rn {
+    --nc: var(--sky);
+}
+
+html.night .rulecard:nth-child(4) .rn {
+    --nc: var(--butter);
+}
+
+html.night .rulecard:nth-child(5) .rn {
+    --nc: var(--lilac);
+}
+
+/* small colored pills, read and outlined by night.js */
+
+html.night .ol {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1.5px var(--tc) !important;
+    color: var(--tc) !important;
+}
+
+html.night .ol * {
+    color: inherit !important;
+}
+
+/* cursors: back to full color with dark names (easier to spot at night) */
+
+html.night .cur .bub {
+    background: var(--c, var(--blush)) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .4) !important;
+}
+
+html.night .cur .bub,
+html.night .cur .bub * {
+    color: #1f1a23 !important;
+}
+
+html.night .cur .tipv path {
+    fill: var(--c, var(--blush));
+    stroke-width: 1.2;
+}
+
+html.night .cur .hand .f,
+html.night .cur .grabhand .f>* {
+    fill: var(--c, var(--blush));
+}
+
+html.night .cur .hand .o {
+    stroke: #1f1a23;
+    fill: #1f1a23;
+}
+
+/* Mochi page: handwritten captions under the moods and colors */
+
+html.night body.mochi .mo-strip .cap {
+    color: var(--ink-soft);
+}
+
+/* frame labels while a box draws in: no white chip, and dark handle dots */
+
+html.night .slot .tag {
+    background: transparent;
+}
+
+html.night .slot .h {
+    background: var(--paper);
+}
+
+/* cursors: yours (the visitor) is solid color with dark words; everyone else, Jessa included, is outlined */
+
+html.night .cur:not(.visitor) .bub {
+    background: var(--card) !important;
+    box-shadow: inset 0 0 0 2px var(--cs, var(--pink)), 0 6px 16px rgba(0, 0, 0, .4) !important;
+}
+
+html.night .cur:not(.visitor) .bub,
+html.night .cur:not(.visitor) .bub * {
+    color: var(--ink) !important;
+}
+
+html.night .cur:not(.visitor) .tipv path {
+    fill: var(--card);
+    stroke: var(--cs, var(--pink));
+    stroke-width: 1.8;
+}
+
+/* hands (wave, open grab, fist): a light fill inside a dark outline, so the fingers read instead of a blob */
+
+html.night .cur .hand .o,
+html.night .cur .grabhand .o>* {
+    fill: #0f0d12 !important;
+    stroke: #0f0d12 !important;
+}
+
+html.night .cur .hand .f,
+html.night .cur .grabhand .f>* {
+    fill: var(--c, var(--mint)) !important;
+}
+
+/* every one-color tool logo (no color of its own) turns white at night */
+
+html.night img[src*="/tools/"][src$=".svg"]:not([src*="python"]),
+html.night img[src*="/tools/mobbin"] {
+    filter: invert(1) brightness(1.15) !important;
+}
+
+/* About: the photo of me gets a hand-drawn ring floating just outside it */
+
+html.night .polaroid-wrap .box::before,
+html.night .slot.photo .box::before {
+    inset: -10px;
+    background: transparent !important;
+    box-shadow: inset 0 0 0 2.5px var(--tc, var(--pink)) !important;
+    filter: url(#wob);
+}
+
+/* magnifier: the plus sits on the light lens, so it stays dark */
+
+html.night .cur .mag .plus {
+    stroke: #1f1a23;
+    opacity: .85;
+}
+
+/* comment panel: dark cards outlined in their color; initials, close, like and send are outlines too */
+
+html.night .cp-card {
+    background: #2a2430 !important;
+    box-shadow: inset 0 0 0 1.5px var(--c, var(--butter));
+}
+
+html.night .cp-meta b {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1.5px var(--c, var(--butter)) !important;
+    color: var(--c, var(--butter)) !important;
+}
+
+html.night .cp-me {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 2px var(--me-c, var(--mint)) !important;
+    color: var(--me-c, var(--mint)) !important;
+}
+
+html.night .cp-x {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .3);
+    color: var(--ink) !important;
+}
+
+html.night .cp-like {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .25);
+    color: var(--ink) !important;
+}
+
+html.night .cp-like.mine {
+    box-shadow: inset 0 0 0 1.5px var(--pink);
+    color: var(--pink) !important;
+}
+
+html.night .cp-send {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 2px var(--me-cs, var(--mint)) !important;
+}
+
+html.night .cp-send svg {
+    stroke: var(--me-cs, var(--mint)) !important;
+}
+
+html.night .cpanel::after,
+html.night .cpanel::before {
+    background: var(--card) !important;
+}
+
+/* comment pins and notes on the page: near-black with a colored edge and a thin black rim, words in their color */
+
+html.night .shared .unote.pin {
+    background: #0f0d12 !important;
+    box-shadow: inset 0 0 0 2px var(--c, var(--uc)), 0 0 0 2px #0f0d12, 0 6px 14px rgba(0, 0, 0, .5) !important;
+}
+
+html.night .shared .unote.pin .nm {
+    color: var(--c, var(--uc)) !important;
+}
+
+/* opened comments (speech bubbles): dark inside, a thin line in their color, light words; the tail is outlined to match */
+
+html.night .unote:not(.pin) {
+    color: var(--ink) !important;
+}
+
+html.night .unote:not(.pin) * {
+    color: inherit !important;
+}
+
+html.night .unote:not(.pin)::before {
+    background: #1a161f;
+    box-shadow: inset 0 0 0 2px var(--nb);
+    filter: url(#wob) drop-shadow(0 10px 22px rgba(0, 0, 0, .55));
+}
+
+html.night .unote:not(.pin)::after {
+    background: var(--nb);
+    bottom: -16px;
+    clip-path: polygon(0 0, 2px 0, 3.4px 14.2px, 19.3px 0, 22px 0, 1.76px 18px);
+    filter: url(#wob);
+}
+
+/* just the two edges of the tail, so it reads as an outline */
+
+/* the hint chip and tooltips near the comments */
+
+html.night .hint {
+    background: var(--card) !important;
+    color: var(--ink) !important;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .18);
+}
+
+/* phone nav: the little dropdown arrow beside the logo goes light */
+
+html.night .pages .file::after {
+    filter: invert(1) brightness(1.2);
+}
+
+/* tag chips that were white in the day (e.g. the first talk on the résumé): a light outline instead */
+
+html.night .favtags span:not(.ol) {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .3) !important;
+    color: var(--ink) !important;
+}
+
+/* phone menu (the fan of pages): dark backdrop, each page an outlined card in its color */
+
+html.night .fan-scrim {
+    background: rgba(15, 13, 18, .9);
+}
+
+html.night .fan .fcard {
+    color: var(--ink);
+    background: transparent !important;
+}
+
+html.night .fan .fcard::before {
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--fc, var(--blush));
+}
+
+html.night .fan .fcard .n {
+    color: var(--fc, var(--ink-soft));
+}
+
+html.night .fan .fcard.on {
+    outline: 0;
+}
+
+html.night .fan .fcard.on::before {
+    box-shadow: inset 0 0 0 3px var(--fc, var(--pink));
+}
+
+html.night .fan .fcard.on::after {
+    color: var(--pink);
+}
+
+html.night .fan .fsec .fcard {
+    --fc: rgba(255, 255, 255, .3);
+}
+
+html.night .fan .fhead {
+    color: var(--ink-soft);
+}
+
+/* keep the phone menu outlines whole: a bit more room on the right, and the wobbly edge drawn just inside each card */
+
+html.night .fan {
+    padding-right: 30px;
+}
+
+html.night .fan .fcard::before {
+    inset: 3px;
+}
+
+/* The Descent: body copy light, and "Visit The Descent" a light pill with dark words */
+
+html.night body.descent .ds-vid p,
+html.night body.descent .ds-phone p,
+html.night body.descent .ds-try span {
+    color: var(--ink-soft);
+}
+
+html.night body.descent .ds-try q {
+    color: var(--sky);
+}
+
+html.night body.descent .ds-cta a::before {
+    background: #ece6f0 !important;
+    box-shadow: none !important;
+}
+
+html.night body.descent .ds-cta a,
+html.night body.descent .ds-cta a * {
+    color: #17141b !important;
+}
+
+/* the comment tool when it's on: outlined in your color, not a white disc */
+
+html.night .tool.picked {
+    background: transparent;
+    box-shadow: inset 0 0 0 2px var(--ucs, var(--mint));
+}
+
+html.night .tool.picked svg {
+    stroke: var(--ink);
+}
+
+/* nav and toolbar pills: draw the outline a little inside the edge so the wobble never clips it (phones especially) */
+
+html.night .pages::before,
+html.night .toolbar .blob {
+    box-shadow: inset 0 0 0 2px rgba(255, 158, 196, .55);
+}
+
+html.night .pages::before {
+    inset: 2px;
+}
+
+/* body copy that was a fixed gray-brown in the day: readable at night */
+
+html.night body.snoot .sn-step p,
+html.night body.mochi .mo-shot p,
+html.night body.mochi .mo-strip .cap,
+html.night body.mboard .say-a {
+    color: var(--ink-soft) !important;
+}
+
+/* phone screenshots: no frame around them at night, the phone is the frame */
+
+html.night .slot.screen .box::before {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* highlighted lead-ins (Luminance): a glowing highlighter swipe at night, words stay readable */
+
+html.night b.lead {
+    color: var(--ink) !important;
+    box-shadow: none !important;
+}
+
+html.night b.lead.l1 {
+    --hl: rgba(255, 143, 194, .38);
+}
+
+html.night b.lead.l2 {
+    --hl: rgba(122, 211, 163, .34);
+}
+
+html.night b.lead.l3 {
+    --hl: rgba(243, 210, 90, .36);
+}
+
+html.night b.lead.l4 {
+    --hl: rgba(140, 193, 255, .34);
+}
+
+html.night b.lead.l5 {
+    --hl: rgba(184, 155, 255, .36);
+}

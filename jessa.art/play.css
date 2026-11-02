@@ -1,0 +1,1665 @@
+/* Play layer: visitors can stamp, draw, note, type and draw shapes on top of any page.
+   Nothing is saved. Colors follow the visitor's cursor tint. */
+
+.play {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    --uc: var(--mint);
+    --ucs: var(--mint-deep);
+}
+
+/* clip, don't scroll: another visitor's cursor below the page's end (they have a taller screen) must not stretch the page */
+
+.play {
+    overflow: clip;
+}
+
+.play.lilac {
+    --uc: var(--lilac);
+    --ucs: var(--lilac-deep);
+}
+
+.play.sky {
+    --uc: var(--sky);
+    --ucs: var(--sky-deep);
+}
+
+.play .ink {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.play .ink path {
+    fill: none;
+    stroke: var(--ucs);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.play .ink path.butter {
+    fill: var(--ucs);
+    stroke: var(--ucs);
+    stroke-width: .6;
+    stroke-linejoin: round;
+}
+
+.play .ink path.live {
+    stroke-dasharray: none;
+}
+
+.uitem {
+    position: absolute;
+    pointer-events: auto;
+    z-index: 31;
+    transform-origin: center;
+}
+
+.uitem.pop {
+    animation: popIn .5s var(--spring) both;
+}
+
+.uitem .x {
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--ink);
+    color: #fff;
+    font: 700 13px/22px var(--font);
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(.6);
+    transition: opacity .2s, transform .35s var(--spring);
+    z-index: 2;
+    padding: 0;
+}
+
+.uitem:hover .x,
+.uitem.editing .x {
+    opacity: 1;
+    transform: scale(1);
+}
+
+body.tool-move .uitem {
+    cursor: grab;
+}
+
+.uitem.grab {
+    cursor: grabbing;
+    z-index: 40;
+}
+
+.ustamp {
+    font-size: 38px;
+    line-height: 1;
+    padding: 4px;
+    user-select: none;
+    rotate: var(--rot, 0deg);
+}
+
+.unote {
+    width: 190px;
+    padding: 12px 16px 14px;
+    border-radius: 48% 52% 46% 54% / 54% 46% 56% 44%;
+    background: var(--uc);
+    font-family: var(--hand);
+    font-size: 22px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--ink);
+    box-shadow: 0 8px 20px rgba(130, 95, 140, .14);
+    rotate: var(--rot, -3deg);
+}
+
+.unote .ed {
+    outline: 0;
+    min-height: 1.2em;
+    word-break: break-word;
+    text-align: center;
+}
+
+.unote .ed:empty::before {
+    content: "say something…";
+    opacity: .45;
+}
+
+.utext {
+    padding: 6px 10px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.2;
+    color: var(--ink);
+    min-width: 20px;
+    white-space: pre-wrap;
+}
+
+.utext .ed {
+    outline: 0;
+    min-width: 12px;
+}
+
+.utext .ed:empty::before {
+    content: "type…";
+    opacity: .4;
+}
+
+.utext.editing {
+    outline: 2px dashed var(--ucs);
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+.ushape {
+    border-radius: 26px;
+    isolation: isolate;
+    min-width: 20px;
+    min-height: 20px;
+}
+
+.ushape::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--fillc, var(--uc));
+    filter: url(#wob) drop-shadow(0 12px 22px rgba(130, 95, 140, .13));
+}
+
+.ushape.drawing {
+    outline: 2px dashed var(--ucs);
+    outline-offset: 3px;
+}
+
+.ushape.drawing::before {
+    filter: none;
+}
+
+.ushape .h {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid var(--ucs);
+    display: none;
+}
+
+.ushape.drawing .h {
+    display: block;
+}
+
+.ushape .h.tl {
+    left: -7px;
+    top: -7px;
+}
+
+.ushape .h.tr {
+    right: -7px;
+    top: -7px;
+}
+
+.ushape .h.bl {
+    left: -7px;
+    bottom: -7px;
+}
+
+.ushape .h.br {
+    right: -7px;
+    bottom: -7px;
+}
+
+.ushape .pill {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 10px);
+    transform: translateX(-50%);
+    background: var(--ucs);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 100px;
+    white-space: nowrap;
+    display: none;
+}
+
+.ushape.drawing .pill {
+    display: block;
+}
+
+/* toolbar: the visitor's picked tool gets a ring in their color; emoji tray above the star */
+
+.tool.picked {
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--ucs, var(--mint-deep));
+}
+
+.tool.picked svg {
+    stroke: var(--ink);
+}
+
+.tray {
+    position: fixed;
+    left: 50%;
+    bottom: 96px;
+    z-index: 61;
+    transform: translateX(-50%) translateY(12px) scale(.9);
+    display: flex;
+    gap: 4px;
+    padding: 8px 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .45s var(--spring);
+    isolation: isolate;
+}
+
+.tray::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 999px;
+    background: #fff;
+    filter: url(#wobs) drop-shadow(0 10px 24px rgba(130, 95, 140, .16));
+}
+
+.tray.on {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.tray button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    font-size: 24px;
+    line-height: 1;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform .4s var(--spring), background .2s;
+}
+
+.tray button:hover {
+    transform: scale(1.2);
+    background: var(--blush);
+}
+
+.tray button.on {
+    background: var(--butter);
+}
+
+.hint {
+    position: fixed;
+    left: 50%;
+    bottom: 96px;
+    z-index: 61;
+    transform: translateX(-50%);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 100px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.hint.on {
+    opacity: 1;
+}
+
+/* the visitor's held tool under their bubble */
+
+.cur.visitor .held {
+    left: 14px;
+    top: 46px;
+}
+
+.cur.visitor .held svg {
+    stroke: var(--cs);
+}
+
+.cur.visitor .held .em {
+    font-size: 15px;
+    line-height: 1;
+}
+
+body.tool-pen,
+body.tool-sticker,
+body.tool-comment,
+body.tool-text,
+body.tool-frame {
+    user-select: none;
+}
+
+body.tool-pen .slot,
+body.tool-frame .slot,
+body.tool-sticker .slot,
+body.tool-comment .slot,
+body.tool-text .slot {
+    cursor: crosshair;
+}
+
+@media (hover: none),
+(pointer: coarse) {
+    .tray {
+        bottom: 86px;
+    }
+}
+
+.toolbar .clear-pill {
+    appearance: none;
+    border: 0;
+    font: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 100px;
+    --wb: #fff;
+    margin-left: 8px;
+    cursor: pointer;
+    display: none;
+    transition: transform .45s var(--spring);
+    animation: popIn .5s var(--spring) both;
+}
+
+.toolbar .clear-pill.on {
+    display: inline-block;
+}
+
+.toolbar .clear-pill:hover {
+    transform: scale(1.06);
+    --wb: var(--blush-2);
+}
+
+.uitem.bye,
+.play .ink path.bye {
+    animation: bye .3s var(--soft) forwards;
+}
+
+.play .ink path.bye {
+    opacity: 0;
+    transition: opacity .3s;
+    animation: none;
+}
+
+.uitem {
+    cursor: grab;
+}
+
+.note,
+.unote {
+    text-align: center;
+}
+
+/* Sparks: a burst on work-tile hover, and a soft trail that follows the mouse */
+
+/* Little colorful spark when a work tile is hovered */
+
+.spark {
+    position: fixed;
+    z-index: 58;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    animation: sparkFly .75s cubic-bezier(.2, .8, .3, 1) forwards;
+}
+
+.spark svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: var(--sc);
+}
+
+@keyframes sparkFly {
+    0% {
+        transform: translate(-50%, -50%) scale(.2) rotate(0deg);
+        opacity: 1;
+    }
+    60% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--spin));
+        opacity: 0;
+    }
+}
+
+.spark.trail {
+    animation: sparkTrail 1.1s cubic-bezier(.2, .8, .3, 1) forwards;
+}
+
+@keyframes sparkTrail {
+    0% {
+        transform: translate(-50%, -50%) scale(1.05) rotate(0deg);
+        opacity: 1;
+    }
+    55% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--dx) * .5), calc(-50% + var(--dy) * .5)) scale(.9) rotate(calc(var(--spin) * .5));
+    }
+    100% {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2) rotate(var(--spin));
+        opacity: 0;
+    }
+}
+
+/* ---------- Phone nav: the pill collapses, pages fan out like a hand of frames ---------- */
+
+@media (max-width: 860px) {
+    .pages {
+        max-width: calc(100vw - 112px);
+        overflow: visible;
+        cursor: pointer;
+    }
+    .pages .chip:not(.active):not(.crumb) {
+        display: none;
+    }
+    .pages .chip.active {
+        pointer-events: none;
+    }
+    .pages .chip.crumb {
+        white-space: nowrap;
+    }
+    .pages .subfloat {
+        display: none !important;
+    }
+    /* a hand-drawn chevron, inked in the same stroke as Jessa's smiley */
+    .pages .file::after {
+        content: "";
+        width: 16px;
+        height: 12px;
+        margin-left: 8px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16' fill='none' stroke='%231C2334' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.2 3.6c2.4 2.3 5.3 5.6 8.1 8.9 0.3 0.4 0.9 0.5 1.3 0.1 2.6-3.3 5.5-6.4 8.2-9.3'/%3E%3C/svg%3E") center / contain no-repeat;
+        transition: transform .45s var(--spring);
+    }
+    body.pages-open .pages .file::after {
+        transform: rotate(180deg);
+    }
+}
+
+.fan {
+    position: fixed;
+    inset: 0;
+    z-index: 63;
+    display: none;
+    padding: 84px 20px 40px;
+    overflow-y: auto;
+    pointer-events: none;
+}
+
+body.pages-open .fan {
+    display: block;
+    pointer-events: auto;
+}
+
+.fan .fcard {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 -4px;
+    padding: 20px 22px 20px 20px;
+    border-radius: 28px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -.01em;
+    background: var(--fc, var(--blush));
+    box-shadow: 0 10px 24px rgba(130, 95, 140, .14);
+    isolation: isolate;
+    rotate: var(--tilt, 0deg);
+    translate: var(--nx, 0px) 0;
+    opacity: 0;
+    transform: translateY(-18px) scale(.9);
+    animation: fanIn .55s var(--spring) forwards;
+    animation-delay: calc(var(--i) * 55ms);
+    cursor: pointer;
+    border: 0;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font);
+}
+
+.fan .fcard::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--fc, var(--blush));
+    filter: url(#wobs);
+}
+
+.fan .fcard .n {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    min-width: 28px;
+}
+
+.fan .fcard.on {
+    outline: 2.5px solid var(--pink-deep);
+    outline-offset: -2.5px;
+}
+
+.fan .fcard.on::after {
+    content: "you’re here";
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--pink-deep);
+}
+
+.fan .fcard:active {
+    transform: scale(.97);
+}
+
+@keyframes fanIn {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.fan .fhead {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 28px 0 12px 10px;
+    opacity: 0;
+    animation: fanIn .4s var(--spring) forwards;
+    animation-delay: calc(var(--i) * 55ms);
+}
+
+.fan .fsec .fcard {
+    font-size: 18px;
+    padding: 14px 18px;
+    background: #fff;
+    --fc: #fff;
+}
+
+.fan-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 58;
+    display: none;
+    background: rgba(255, 255, 255, .86);
+    backdrop-filter: blur(10px);
+}
+
+body.pages-open .fan-scrim {
+    display: block;
+}
+
+body.pages-open .pages {
+    z-index: 64;
+}
+
+body.pages-open {
+    overflow: hidden;
+}
+
+body.pages-open .toolbar,
+body.pages-open .people {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (min-width: 861px) {
+    .fan,
+    .fan-scrim {
+        display: none !important;
+    }
+}
+
+/* Touch devices (phones and tablets): no people dots, since there's no cursor to match. A narrow desktop window keeps them. */
+
+@media (hover: none),
+(pointer: coarse) {
+    .people {
+        display: none;
+    }
+    .pages {
+        max-width: calc(100vw - 24px);
+    }
+}
+
+/* Touch: Jessa's cursor only shows while she builds the home page; case pages never show it */
+
+@media (hover: none),
+(pointer: coarse) {
+    body.case-page .cur.jessa,
+    body.jessa-gone .cur.jessa {
+        display: none !important;
+    }
+}
+
+/* typing: letters pop in */
+
+.popch {
+    position: fixed;
+    z-index: 95;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transform-origin: 50% 60%;
+    animation: popCh .5s cubic-bezier(.34, 1.56, .64, 1) forwards;
+}
+
+@keyframes popCh {
+    0% {
+        transform: translate(-50%, -50%) scale(2.6) rotate(-10deg);
+        opacity: .9;
+    }
+    100% {
+        transform: translate(-50%, -62%) scale(1);
+        opacity: 0;
+    }
+}
+
+.uitem.bump {
+    animation: bump .28s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes bump {
+    0% {
+        scale: 1;
+    }
+    40% {
+        scale: 1.045;
+    }
+    100% {
+        scale: 1;
+    }
+}
+
+/* other people here right now */
+
+.cur.peer-cur {
+    position: absolute;
+    z-index: 29;
+    transition: transform .21s linear, opacity .4s;
+    --c: var(--mint);
+    --cs: var(--mint-deep);
+}
+
+.cur.peer-cur.lilac {
+    --c: var(--lilac);
+    --cs: var(--lilac-deep);
+}
+
+.cur.peer-cur.sky {
+    --c: var(--sky);
+    --cs: var(--sky-deep);
+}
+
+.cur.peer-cur .bub {
+    animation-duration: 7s;
+}
+
+/* a pretend visitor clicking: the arrow presses in and a small ring pops */
+
+.cur.peer-cur.tap .tipv {
+    animation: curTap .38s var(--spring);
+}
+
+.cur.peer-cur.tap::before {
+    content: "";
+    position: absolute;
+    left: -12px;
+    top: -12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid var(--cs);
+    opacity: 0;
+    animation: botRing .5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes curTap {
+    40% {
+        scale: .72;
+    }
+}
+
+@keyframes botRing {
+    0% {
+        opacity: .9;
+        transform: scale(.3);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.4);
+    }
+}
+
+.dot.peer {
+    --c: var(--mint);
+    --cs: var(--mint-deep);
+    animation: popIn .5s var(--spring) both;
+}
+
+.dot.peer.lilac {
+    --c: var(--lilac);
+    --cs: var(--lilac-deep);
+}
+
+.dot.peer.sky {
+    --c: var(--sky);
+    --cs: var(--sky-deep);
+}
+
+.dot.peer {
+    cursor: pointer;
+}
+
+.dot.peer.away::before,
+.dot.peer.away>span:first-child {
+    opacity: .45;
+    transition: opacity .2s;
+}
+
+/* away people sit at the end of the row, faded (just the circle; the hover label stays crisp) */
+
+.dot.peer.away:hover::before,
+.dot.peer.away:hover>span:first-child {
+    opacity: 1;
+}
+
+/* clicking someone's dot finds them: their cursor waves with a ring */
+
+.cur.peer-cur.found {
+    z-index: 31;
+}
+
+.cur.peer-cur.found::before,
+.cur.peer-cur.found::after {
+    content: "";
+    position: absolute;
+    left: -26px;
+    top: -26px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid var(--cs);
+    opacity: 0;
+    animation: foundRing 1.1s ease-out 3;
+    pointer-events: none;
+}
+
+.cur.peer-cur.found::after {
+    animation-delay: .35s;
+}
+
+.cur.peer-cur.found .bub {
+    animation: foundBub .6s var(--spring) 3;
+}
+
+@keyframes foundRing {
+    0% {
+        transform: scale(.4);
+        opacity: .9;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+@keyframes foundBub {
+    0%,
+    100% {
+        transform: rotate(0) scale(1);
+    }
+    40% {
+        transform: rotate(-6deg) scale(1.15);
+    }
+}
+
+/* shared comments: notes other visitors left, approved by Jessa, pinned to a frame */
+
+.shared {
+    position: absolute;
+    inset: 0;
+    z-index: 29;
+    pointer-events: none;
+}
+
+.shared .unote {
+    position: absolute;
+    pointer-events: none;
+    cursor: default;
+    translate: -50% -50%;
+    rotate: var(--rot, 0deg);
+    /* own properties, so the pop-in animation (transform) can't undo the centering */
+    animation: popIn .6s var(--spring) both;
+    background: var(--c, var(--butter));
+}
+
+.shared .unote small {
+    display: block;
+    margin-top: 6px;
+    font: 700 11.5px/1 var(--font);
+    opacity: .6;
+}
+
+.shared .unote:hover {
+    z-index: 2;
+}
+
+.play .unote.mine {
+    outline: 2px dashed var(--pink);
+    outline-offset: 4px;
+}
+
+.play .unote .wait {
+    display: block;
+    margin-top: 6px;
+    font: 700 11px/1 var(--font);
+    color: var(--pink-deep);
+}
+
+.shared.off {
+    display: none;
+}
+
+/* comments on the canvas: the full note only for the one picked in the panel; the rest are small numbered pins */
+
+.shared .unote .nm {
+    display: none;
+}
+
+.shared .unote.pin {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50% 50% 50% 6px;
+    rotate: 0deg;
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 0 0 2.5px #fff, 0 6px 14px rgba(130, 95, 140, .22);
+    transition: scale .3s var(--spring);
+}
+
+.shared .unote.pin:hover {
+    scale: 1.18;
+}
+
+.shared .unote.pin .nm {
+    display: block;
+    font: 700 13px/1 var(--font);
+}
+
+.shared .unote.pin .tx,
+.shared .unote.pin small {
+    display: none;
+}
+
+.shared .unote.open {
+    z-index: 3;
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 14px 34px rgba(130, 95, 140, .25);
+}
+
+.shared .unote .tx {
+    display: block;
+}
+
+/* the Comments panel: a speech bubble that pops up from the Comments button, just above the toolbar */
+
+.cpanel {
+    position: fixed;
+    z-index: 65;
+    left: var(--px, 50%);
+    bottom: var(--pb, 104px);
+    width: min(360px, calc(100vw - 36px));
+    max-height: min(470px, calc(100vh - 190px));
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 26px 26px 26px 26px;
+    box-shadow: 0 0 0 2px var(--blush-2, #f6dde6), 0 24px 60px rgba(130, 95, 140, .22);
+    transform-origin: var(--tx, 50%) 100%;
+    scale: .6;
+    opacity: 0;
+    translate: 0 18px;
+    transition: scale .45s var(--spring), opacity .2s, translate .45s var(--spring);
+    font-family: var(--font);
+    color: var(--ink);
+}
+
+.cpanel.in {
+    scale: 1;
+    opacity: 1;
+    translate: 0 0;
+}
+
+.cpanel[hidden] {
+    display: none;
+}
+
+.cpanel:not(.in) {
+    pointer-events: none;
+}
+
+/* closed bubble must never catch clicks meant for the toolbar or sticker tray */
+
+.cpanel::after {
+    content: "";
+    position: absolute;
+    left: var(--tx, 50%);
+    bottom: -11px;
+    width: 22px;
+    height: 22px;
+    margin-left: -11px;
+    background: #fff;
+    border-radius: 0 0 6px 0;
+    rotate: 45deg;
+    box-shadow: 2px 2px 0 0 var(--blush-2, #f6dde6);
+}
+
+/* the bubble's tail, pointing at the button */
+
+.cp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 10px 20px;
+}
+
+.cp-head h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+.cp-head .cp-n {
+    display: inline-grid;
+    place-items: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    margin-left: 4px;
+    border-radius: 100px;
+    background: #ffe486;
+    font-size: 12.5px;
+    vertical-align: 2px;
+}
+
+.cp-x {
+    appearance: none;
+    border: 0;
+    background: var(--blush-2, #f6dde6);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font: 700 19px/1 var(--font);
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform .3s var(--spring);
+}
+
+.cp-x:hover {
+    transform: rotate(90deg) scale(1.08);
+}
+
+.cp-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 14px 12px;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--pink) transparent;
+}
+
+.cp-card {
+    position: relative;
+    text-align: left;
+    padding: 12px 14px 12px;
+    border-radius: 18px 20px 17px 21px;
+    background: color-mix(in srgb, var(--c, var(--butter)) 55%, #fff);
+    cursor: pointer;
+    transition: transform .35s var(--spring), box-shadow .25s;
+    outline: 0;
+}
+
+.cp-card:hover,
+.cp-card:focus-visible {
+    transform: translateY(-2px) rotate(-.4deg);
+}
+
+.cp-card.on {
+    box-shadow: 0 0 0 2.5px var(--ink);
+}
+
+.cp-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    font-weight: 700;
+    opacity: .7;
+    padding-right: 54px;
+}
+
+.cp-meta b {
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50% 50% 50% 4px;
+    background: var(--c, var(--butter));
+    box-shadow: 0 0 0 2px #fff;
+    font-size: 11px;
+    opacity: 1;
+    flex: none;
+}
+
+.cp-tx {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--hand);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.12;
+    word-break: break-word;
+}
+
+.cp-like {
+    position: absolute;
+    right: 10px;
+    top: 9px;
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    padding: 4px 9px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, .75);
+    font: 700 12.5px/1 var(--font);
+    color: var(--ink);
+    transition: transform .3s var(--spring), background .2s, color .2s;
+}
+
+.cp-like:hover {
+    transform: scale(1.1);
+}
+
+.cp-like.mine {
+    background: var(--pink);
+    color: #fff;
+    cursor: default;
+}
+
+.cp-like.pop {
+    animation: likePop .5s var(--spring);
+}
+
+@keyframes likePop {
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.35) rotate(-8deg);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.cp-empty {
+    margin: 8px 6px;
+    font-family: var(--hand);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.15;
+    opacity: .55;
+}
+
+/* the composer: a soft butter bubble with your pin, handwriting, and a round pink send button */
+
+.cp-new {
+    padding: 6px 14px 14px;
+}
+
+.cp-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 7px 7px 9px;
+    border-radius: 24px 27px 23px 26px / 26px 23px 27px 24px;
+    background: #fff;
+    box-shadow: 0 0 0 2.5px var(--me-c, var(--mint));
+    transition: box-shadow .25s, transform .35s var(--spring);
+}
+
+.cp-box:focus-within {
+    box-shadow: 0 0 0 3px var(--me-cs, var(--mint-deep)), 0 8px 20px rgba(130, 95, 140, .12);
+    transform: rotate(-.5deg) scale(1.012);
+}
+
+/* your initial in a pin, coloured like your cursor's arrow: its light fill and deeper outline */
+
+.cp-me {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50% 50% 50% 6px;
+    background: var(--me-c, var(--mint));
+    color: var(--ink);
+    font: 800 12.5px/1 var(--font);
+    box-shadow: 0 0 0 2px var(--me-cs, var(--mint-deep)), 0 0 0 4px #fff;
+    rotate: -6deg;
+}
+
+.cp-new textarea {
+    flex: 1;
+    min-width: 0;
+    align-self: center;
+    box-sizing: border-box;
+    resize: none;
+    border: 0;
+    background: transparent;
+    padding: 7px 2px 6px;
+    max-height: 96px;
+    font: 700 21px/1.15 var(--hand);
+    color: var(--ink);
+    outline: 0;
+    box-shadow: none;
+}
+
+.cp-new textarea::placeholder {
+    color: var(--ink);
+    opacity: .4;
+}
+
+.cp-send {
+    position: relative;
+    flex: none;
+    align-self: center;
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--me-cs, var(--mint-deep));
+    box-shadow: 0 6px 14px rgba(130, 95, 140, .22);
+    opacity: .55;
+    transition: transform .4s var(--spring), opacity .2s, filter .2s;
+}
+
+.cp-new.has .cp-send {
+    opacity: 1;
+}
+
+.cp-send:hover {
+    transform: rotate(-12deg) scale(1.1);
+    filter: brightness(.94) saturate(1.2);
+}
+
+.cp-send:active {
+    transform: scale(.92);
+}
+
+.cp-send svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    translate: -1px 1px;
+}
+
+.cp-heart {
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    font-style: normal;
+    font-size: 14px;
+    color: var(--me-cs, var(--pink-deep));
+    pointer-events: none;
+    opacity: 0;
+    animation: cpHeart 1s var(--d, 0ms) ease-out forwards;
+}
+
+@keyframes cpHeart {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(.4);
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx, 0px)), -46px) scale(1.15) rotate(12deg);
+    }
+}
+
+.cp-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    max-height: 0;
+    margin-top: 0;
+    overflow: hidden;
+    transition: max-height .35s var(--spring), margin-top .35s var(--spring);
+}
+
+.cp-new.row-on .cp-row {
+    max-height: 40px;
+    margin-top: 8px;
+    overflow: visible;
+}
+
+.cp-msg {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--pink-deep);
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: var(--blush, #ffecec);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .3s, transform .4s var(--spring);
+}
+
+.cp-msg.on {
+    opacity: 1;
+    transform: none;
+}
+
+.cp-msg.bad {
+    color: #d4663f;
+    background: #fff1ea;
+}
+
+.cp-count {
+    font-size: 11px;
+    font-weight: 700;
+    opacity: .5;
+    margin-left: auto;
+}
+
+@media (hover: none),
+(pointer: coarse),
+(max-width: 860px) {
+    .cpanel {
+        display: none;
+    }
+}
+
+.toolbar .cm-pill,
+.toolbar .cm-pill:hover {
+    --wb: #ffe486;
+}
+
+.toolbar .cm-pill:hover {
+    --wb: var(--butter-deep);
+}
+
+@media (hover: none),
+(pointer: coarse),
+(max-width: 860px) {
+    .toolbar .cm-pill.on {
+        display: none;
+    }
+}
+
+/* comments toggle is desktop only */
+
+.uitem.settle {
+    transition: top .35s var(--spring), left .35s var(--spring);
+}
+
+/* with the pen or frame tool picked, a finger on the page draws instead of scrolling; pick the arrow again to scroll */
+
+body.tool-pen .canvas,
+body.tool-frame .canvas {
+    touch-action: none;
+}
+
+/* crowd: extra visitors fold into a +N bubble */
+
+.people .dot.peer.over {
+    display: none;
+}
+
+.people .dot.more {
+    --c: var(--butter);
+    --cs: #f2cf5b;
+    cursor: default;
+    animation: popIn .5s var(--spring) both;
+    opacity: 1;
+}
+
+.people .dot.more span:first-child {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.people .dot.more span:first-child {
+    font-size: 13px;
+    letter-spacing: -.02em;
+}
+
+/* phones: the page pill and the people row share the top line without touching */
+
+@media (max-width: 860px) {
+    .pages {
+        max-width: calc(100vw - 150px) !important;
+    }
+    .people .dot {
+        width: 36px;
+        height: 36px;
+        margin-left: -9px;
+    }
+    .people .dot:first-child {
+        margin-left: 0;
+    }
+    .people .dot span:first-child {
+        font-size: 13px;
+    }
+}
+
+/* custom stickers (images) */
+
+.ustamp img {
+    display: block;
+    width: 60px;
+    height: 60px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    filter: drop-shadow(0 4px 8px rgba(130, 95, 140, .18));
+}
+
+.tray button img {
+    display: block;
+    width: 32px;
+    height: 32px;
+    margin: auto;
+    pointer-events: none;
+}
+
+.cur.visitor .held .em img {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+/* someone else's sticker: pops in, shows who left it, fades after a few seconds */
+
+.shared-stamp {
+    position: absolute;
+    z-index: 28;
+    pointer-events: none;
+    animation: popIn .5s var(--spring) both;
+    transition: opacity .9s, translate .9s;
+}
+
+.shared-stamp.bye {
+    opacity: 0;
+    translate: 0 -14px;
+}
+
+.shared-stamp .who {
+    position: absolute;
+    left: 50%;
+    top: calc(100% - 4px);
+    translate: -50% 0;
+    white-space: nowrap;
+    font: 700 11px/1 var(--font);
+    padding: 3px 8px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, .92);
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(130, 95, 140, .15);
+}
+
+/* the grab cursor: an open hand over things you can move, a fist while you move them (in the visitor's colour) */
+
+.cur .grabhand {
+    position: absolute;
+    left: -12px;
+    top: -12px;
+    width: 34px;
+    height: 34px;
+    overflow: visible;
+    pointer-events: none;
+    transform: scale(0) rotate(-20deg);
+    transform-origin: 50% 60%;
+    transition: transform .3s var(--spring);
+}
+
+.cur .grabhand .o>* {
+    fill: var(--cs, var(--mint-deep));
+    stroke: var(--cs, var(--mint-deep));
+    stroke-width: 3.2;
+    stroke-linejoin: round;
+}
+
+/* a fat outline: the same shapes drawn bigger underneath */
+
+.cur .grabhand .f>* {
+    fill: var(--c, var(--mint));
+}
+
+.cur.grabby .tipv {
+    transform: rotate(-34deg) scale(0);
+    transition: transform .2s;
+}
+
+.cur.grabby:not(.grabbing) .grabhand.open {
+    transform: scale(1) rotate(0);
+}
+
+.cur.grabbing .grabhand.fist {
+    transform: scale(.95) rotate(-6deg);
+}
+
+.cur.grabby .bub {
+    translate: 14px 10px;
+    transition: translate .3s var(--spring);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .cur.grabby:not(.grabbing) .grabhand.open {
+        animation: handWiggle 1.8s ease-in-out .3s infinite;
+    }
+    @keyframes handWiggle {
+        50% {
+            transform: scale(1.04) rotate(-7deg);
+        }
+    }
+}
+
+/* with the custom cursor on, the browser's own grab/grabbing/zoom hands stay hidden (the visitor's cursor draws them) */
+
+body.fancy-cursor .uitem,
+body.fancy-cursor .uitem.grab,
+body.fancy-cursor .slot.draggable.done,
+body.fancy-cursor .slot.grab,
+body.fancy-cursor.tool-move .uitem,
+body.fancy-cursor .uitem *:not(input):not(textarea):not([contenteditable]),
+body.fancy-cursor .slot.draggable.done *:not(input):not(textarea):not(select):not([contenteditable]) {
+    cursor: none !important;
+}
+
+/* the text cursor: an I-beam in the visitor's colour over fields and editable text */
+
+.cur .ibeam {
+    position: absolute;
+    left: -6px;
+    top: -14px;
+    width: 14px;
+    height: 28px;
+    overflow: visible;
+    pointer-events: none;
+    transform: scale(0);
+    transition: transform .25s var(--spring);
+}
+
+.cur .ibeam .o path {
+    fill: none;
+    stroke: var(--cs, var(--mint-deep));
+    stroke-width: 4.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.cur .ibeam .f path {
+    fill: none;
+    stroke: var(--c, var(--mint));
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.cur.texting .ibeam {
+    transform: scale(1);
+}
+
+.cur.texting .tipv,
+.cur.texting .grabhand,
+.cur.texting .mag {
+    transform: scale(0) !important;
+}
+
+.cur.texting .bub {
+    translate: 12px 14px;
+    transition: translate .3s var(--spring);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .cur.texting .ibeam {
+        animation: beamBlink 1.1s steps(1) .4s infinite;
+    }
+    @keyframes beamBlink {
+        60% {
+            opacity: .55;
+        }
+    }
+}
+
+body.fancy-cursor input,
+body.fancy-cursor textarea,
+body.fancy-cursor [contenteditable="true"] {
+    cursor: none !important;
+}
+
+/* notes are speech bubbles: a rounded, squarish box with a little tail at the bottom left, wobbled like the rest of the site.
+   The colour is drawn behind the text (::before + ::after), so the wobble filter never touches the words */
+
+.unote:not(.pin) {
+    --nb: var(--uc);
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0;
+    isolation: isolate;
+    padding: 14px 18px 16px;
+}
+
+.shared .unote:not(.pin) {
+    --nb: var(--c, var(--butter));
+}
+
+.unote:not(.pin)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 18px 22px 20px 16px;
+    background: var(--nb);
+    filter: url(#wob) drop-shadow(0 8px 14px rgba(130, 95, 140, .16));
+}
+
+.unote:not(.pin)::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 20px;
+    bottom: -13px;
+    width: 22px;
+    height: 18px;
+    background: var(--nb);
+    clip-path: polygon(0 0, 100% 0, 8% 100%);
+    filter: url(#wob);
+}
+
+.shared .unote.open::before {
+    filter: url(#wob) drop-shadow(0 14px 22px rgba(130, 95, 140, .25));
+}
+
+.play .unote.mine {
+    outline: 0;
+}
+
+.play .unote.mine::before {
+    outline: 2px dashed var(--pink);
+    outline-offset: 5px;
+}
+
+/* phones: picking a tool slims the toolbar down to Move, that tool and Clear, so it never grows or squishes */
+
+@media (max-width: 860px) {
+    .toolbar .tool {
+        flex: none;
+    }
+    body:is(.tool-frame,
+    .tool-text,
+    .tool-pen,
+    .tool-sticker,
+    .tool-comment) .toolbar .tool:not([data-tool="move"]):not(.picked),
+    body:is(.tool-frame,
+    .tool-text,
+    .tool-pen,
+    .tool-sticker,
+    .tool-comment) .toolbar .tbsep {
+        display: none;
+    }
+    body:is(.tool-frame,
+    .tool-text,
+    .tool-pen,
+    .tool-sticker,
+    .tool-comment) .toolbar .clear-pill:not(.cm-pill) {
+        display: inline-block;
+    }
+}
